@@ -1,24 +1,24 @@
-FROM node:18-alpine AS builder
+# syntax=docker/dockerfile:1.4
+
+FROM node:18-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
+
+FROM deps AS builder
+COPY . .
+RUN npm run build
 
 FROM node:18-alpine AS runner
+ENV NODE_ENV=production
 WORKDIR /app
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
+# Copy only the dist artefacts we need for Next.js
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
 
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY . .
-
-RUN chown -R nextjs:nodejs /app
-USER nextjs
+RUN npm ci --omit=dev
 
 EXPOSE 3000
-
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
