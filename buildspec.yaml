@@ -1,0 +1,29 @@
+version: 0.2
+
+# CodeBuild project must have:
+# - Source: CODEPIPELINE
+# - Artifacts: CODEPIPELINE
+
+phases:
+  install:
+    commands:
+      - echo "Packaging repo for CodeDeploy"
+  build:
+    commands:
+      - echo "Nothing to compile here; EC2 scripts will build the Docker image."
+  post_build:
+    commands:
+      - echo "Preparing deployment bundle"
+artifacts:
+  files:
+    # CodeDeploy needs these:
+    - appspec.yml
+    - scripts/**/*
+    # Your app + Dockerfile (so EC2 can build it)
+    - Dockerfile
+    - '**/*'
+  discard-paths: no
+  # Optional: exclude junk
+  # exclude-paths:
+  #   - .git/**/*
+  #   - node_modules/**/*
