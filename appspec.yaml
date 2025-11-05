@@ -3,14 +3,25 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/app
+    overwrite: true
+
+permissions:
+  - object: /home/ubuntu/app/scripts/
+    pattern: "**"
+    mode: 755
+    owner: ubuntu
+    group: ubuntu
 
 hooks:
   BeforeInstall:
     - location: scripts/stop_server.sh
       timeout: 60
+      runas: ubuntu
   AfterInstall:
     - location: scripts/install_dependencies.sh
-      timeout: 120
+      timeout: 300
+      runas: ubuntu
   ApplicationStart:
     - location: scripts/start_server.sh
-      timeout: 60
+      timeout: 120
+      runas: ubuntu
