@@ -1,5 +1,5 @@
-# Use Node.js 20 Alpine image
-FROM node:20-alpine
+# Use Node.js 20 Alpine image from AWS public ECR
+FROM public.ecr.aws/docker/library/node:20-alpine
 
 # Set working directory
 WORKDIR /app
