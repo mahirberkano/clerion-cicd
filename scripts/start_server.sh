@@ -3,18 +3,21 @@ set -euxo pipefail
 
 cd /home/ubuntu/app
 
+# Get AWS account ID
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
 # Login to ECR and pull the pre-built image
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 905418374099.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
 
 # Pull the latest image built by CodeBuild
-docker pull 905418374099.dkr.ecr.us-east-1.amazonaws.com/clerion-cicd:latest
+docker pull $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/clerion-cicd:latest
 
 # Start container
 docker run -d \
   --name nextjs-app \
   -p 3000:3000 \
   --restart=always \
-  905418374099.dkr.ecr.us-east-1.amazonaws.com/clerion-cicd:latest
+  $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/clerion-cicd:latest
 
 # Health probe loop
 for i in {1..30}; do
