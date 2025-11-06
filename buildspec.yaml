@@ -21,8 +21,11 @@ phases:
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Creating environment file with account ID...
+      - echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" > .env
 artifacts:
   files:
     - appspec.yml
     - scripts/**/*
+    - .env
   discard-paths: no

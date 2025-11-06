@@ -3,8 +3,8 @@ set -euxo pipefail
 
 cd /home/ubuntu/app
 
-# Get AWS account ID from EC2 metadata service
-AWS_ACCOUNT_ID=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep accountId | cut -d'"' -f4)
+# Source environment file to get AWS account ID
+source .env
 
 # Login to ECR and pull the pre-built image
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
