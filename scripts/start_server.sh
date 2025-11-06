@@ -3,18 +3,20 @@ set -euxo pipefail
 
 cd /home/ubuntu/app
 
-# Build a production image from your Dockerfile
-# Tag with the current commit if you pass it via env; here we use 'latest'
-docker build -t nextjs-app:latest .
+# Login to ECR and pull the pre-built image
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 905418374099.dkr.ecr.us-east-1.amazonaws.com
 
-# Start container (example: Next.js on port 3000)
+# Pull the latest image built by CodeBuild
+docker pull 905418374099.dkr.ecr.us-east-1.amazonaws.com/clerion-cicd:latest
+
+# Start container
 docker run -d \
   --name nextjs-app \
   -p 3000:3000 \
   --restart=always \
-  nextjs-app:latest
+  905418374099.dkr.ecr.us-east-1.amazonaws.com/clerion-cicd:latest
 
-# (Optional) Health probe loop so CodeDeploy waits before traffic shift
+# Health probe loop
 for i in {1..30}; do
   curl -fsS http://localhost:3000/ >/dev/null && exit 0
   sleep 2

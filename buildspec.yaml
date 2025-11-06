@@ -1,29 +1,27 @@
 version: 0.2
 
-# CodeBuild project must have:
-# - Source: CODEPIPELINE
-# - Artifacts: CODEPIPELINE
-
 phases:
-  install:
+  pre_build:
     commands:
-      - echo "Packaging repo for CodeDeploy"
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 905418374099.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=905418374099.dkr.ecr.us-east-1.amazonaws.com/clerion-cicd
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
-      - echo "Nothing to compile here; EC2 scripts will build the Docker image."
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - echo "Preparing deployment bundle"
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
 artifacts:
   files:
-    # CodeDeploy needs these:
     - appspec.yml
     - scripts/**/*
-    # Your app + Dockerfile (so EC2 can build it)
-    - Dockerfile
-    - '**/*'
   discard-paths: no
-  # Optional: exclude junk
-  # exclude-paths:
-  #   - .git/**/*
-  #   - node_modules/**/*
