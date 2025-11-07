@@ -72,7 +72,7 @@ export default function RootLayout({ children }) {
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p>© {new Date().getFullYear()} Clerion Labs. All rights reserved.</p>
                 <p className="text-slate-400">
-                  Crafted with care for continuous delivery teams.
+                  Crafted with care for continuous delivery teams...
                 </p>
               </div>
             </footer>
