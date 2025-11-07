@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Home() {
   const highlights = [
     {
-      stat: "Deploy in 4 minutes",
+      stat: "Deploy in 4 minutes!",
       description: "Blueprinted pipelines ship every merge automatically.",
     },
     {
